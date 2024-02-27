@@ -6,15 +6,16 @@ import "swiper/css/pagination";
 
 // TODO: implement pagination here on this page
 const OrderTab = ({ items }) => {
+
     const pagination = {
         clickable: true,
         renderBullet: function (index, className) {
             return '<span class="' + className + '">' + (index + 1) + "</span>";
         },
     };
+
     return (
         <div >
-
             <Swiper
                 pagination={pagination}
                 modules={[Pagination]}
@@ -29,9 +30,7 @@ const OrderTab = ({ items }) => {
                             ></FoodCard>)
                         }
                     </div>
-
                 </SwiperSlide>
-
             </Swiper>
         </div>
     );
