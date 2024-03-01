@@ -7,7 +7,7 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const ManageItems = () => {
     const [menu, , refetch] = useMenu();
-    const [axiosSecure] = useAxiosSecure();
+    const axiosSecure = useAxiosSecure();
 
     const handleDelete = item => {
         Swal.fire({
@@ -47,11 +47,11 @@ const ManageItems = () => {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Item</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Update</th>
-                            <th>Delete</th>
+                            <th>ITEM</th>
+                            <th>CATEGORY</th>
+                            <th>PRICE</th>
+                            <th>UPDATE</th>
+                            <th>DELETE</th>
                         </tr>
                     </thead>
                     <tbody>

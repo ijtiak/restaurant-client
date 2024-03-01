@@ -1,51 +1,52 @@
 import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import { useForm } from 'react-hook-form';
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
+import useAxiosPublic from "../../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const img_hosting_token = import.meta.env.VITE_Image_Upload_token;
+const img_hosting_url = `https://api.imgbb.com/1/upload?key=${img_hosting_token}`;
 
 const AddItem = () => {
-    const [axiosSecure] = useAxiosSecure();
-    const { register, handleSubmit, reset } = useForm();
-    const img_hosting_url = `https://api.imgbb.com/1/upload?key=${img_hosting_token}`
+    const {register, handleSubmit, reset} = useForm();
+    const axiosPublic = useAxiosPublic();
+    const axiosSecure = useAxiosSecure();
 
-    const onSubmit = data => {
-        
-        const formData = new FormData();
-        formData.append('image', data.image[0])
-
-        fetch(img_hosting_url, {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(imgResponse => {
-            if(imgResponse.success){
-                const imgURL = imgResponse.data.display_url;
-                const {name, price, category, recipe} = data;
-                const newItem = {name, price: parseFloat(price), category, recipe, image:imgURL}
-                console.log(newItem)
-                axiosSecure.post('/menu', newItem)
-                .then(data => {
-                    console.log('after posting new menu item', data.data)
-                    if(data.data.insertedId){
-                        reset();
-                        Swal.fire({
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'Item added successfully',
-                            showConfirmButton: false,
-                            timer: 1500
-                          })
-                    }
-                })
+    const onSubmit = async (data) => {
+        // console.log(data);
+        // image upload to imgbb and then get an url
+        const imageFile = { image: data.image[0]}
+        const res = await axiosPublic.post(img_hosting_url, imageFile, {
+            headers: {
+                'content-type': 'multipart/form-data'
             }
-        })
-
+        });
+        if (res.data.success){
+            // now send the menu item data to teh server with the image url
+            const menuItem = {
+                name: data.name,
+                category: data.category,
+                price: parseFloat(data.price),
+                recipe: data.recipe,
+                image: res.data.data.display_url
+            }
+            const menuRes = await axiosSecure.post('/menu', menuItem);
+            // console.log(menuRes.data);
+            if(menuRes.data.insertedId){
+                // show success popup
+                reset();
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: `${data.name} is added to the menu.`,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+        }
+        // console.log(res.data);
     };
-    
-    
+
     return (
         <div className="w-full px-10">
             <SectionTitle subHeading="What's new" heading="Add an item" ></SectionTitle>

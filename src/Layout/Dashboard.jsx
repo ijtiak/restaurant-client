@@ -7,6 +7,7 @@ const Dashboard = () => {
 
     const [cart] = useCart();
     const [isAdmin] = useAdmin();
+    // const isAdmin = true;
 
     return (
         <div className="flex">

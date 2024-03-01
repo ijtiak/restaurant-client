@@ -15,13 +15,13 @@ const SignUp = () => {
 
     const onSubmit = data => {
 
-        console.log(data);
+        // console.log(data);
 
         createUser(data.email, data.password)
             .then(result => {
 
                 const loggedUser = result.user;
-                console.log(loggedUser);
+                // console.log(loggedUser);
 
                 updateUserProfile(data.name, data.photoURL)
                     .then(() => {
@@ -29,12 +29,13 @@ const SignUp = () => {
                         // create user entry in the database
                         const userInfo = {
                             name: data.name,
-                            email: data.email
+                            email: data.email,
+                            role: 'Customer'
                         }
                         axiosPublic.post('/users', userInfo)
                             .then(res => {
                                 if (res.data.insertedId) {
-                                    console.log('user added to database')
+                                    // console.log('user added to database');
                                     reset();
                                     Swal.fire({
                                         position: 'top-end',
