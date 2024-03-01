@@ -51,10 +51,10 @@ const MyCart = () => {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Food</th>
-                            <th>Item Name</th>
-                            <th>Price</th>
-                            <th>Action</th>
+                            <th>FOOD</th>
+                            <th>ITEM NAME</th>
+                            <th>PRICE</th>
+                            <th>ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
