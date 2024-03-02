@@ -9,7 +9,7 @@ import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, PieChart, Pie, Respon
 
 const AdminHome = () => {
     const { user } = useAuth();
-    const [axiosSecure] = useAxiosSecure();
+    const axiosSecure = useAxiosSecure();
 
     const { data: stats = {} } = useQuery({
         queryKey: ['admin-stats'],
