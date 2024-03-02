@@ -1,31 +1,35 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import useCart from "../../../hooks/useCart";
 import useAuth from "../../../hooks/useAuth";
-import './CheckoutForm.css'
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 
-const CheckoutForm = ({ cart, price }) => {
+const CheckoutForm = () => {
+    const [error, setError] = useState('');
+    const [clientSecret, setClientSecret] = useState('')
+    const [transactionId, setTransactionId] = useState('');
     const stripe = useStripe();
     const elements = useElements();
+    const axiosSecure = useAxiosSecure();
     const { user } = useAuth();
-    const [axiosSecure] = useAxiosSecure()
-    const [cardError, setCardError] = useState('');
-    const [clientSecret, setClientSecret] = useState('');
-    const [processing, setProcessing] = useState(false);
-    const [transactionId, setTransactionId] = useState('');
+    const [cart, refetch] = useCart();
+    const navigate = useNavigate();
+
+    const totalPrice = cart.reduce((total, item) => total + item.price, 0)
 
     useEffect(() => {
-        if (price > 0) {
-            axiosSecure.post('/create-payment-intent', { price })
+        if (totalPrice > 0) {
+            axiosSecure.post('/create-payment-intent', { price: totalPrice })
                 .then(res => {
-                    console.log(res.data.clientSecret)
+                    console.log(res.data.clientSecret);
                     setClientSecret(res.data.clientSecret);
                 })
         }
-    }, [price, axiosSecure])
 
+    }, [axiosSecure, totalPrice])
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -34,98 +38,101 @@ const CheckoutForm = ({ cart, price }) => {
             return
         }
 
-        const card = elements.getElement(CardElement);
+        const card = elements.getElement(CardElement)
+
         if (card === null) {
             return
         }
 
-        const { error } = await stripe.createPaymentMethod({
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
             type: 'card',
             card
         })
 
         if (error) {
-            console.log('error', error)
-            setCardError(error.message);
+            console.log('payment error', error);
+            setError(error.message);
         }
         else {
-            setCardError('');
-            // console.log('payment method', paymentMethod)
+            console.log('payment method', paymentMethod)
+            setError('');
         }
 
-        setProcessing(true)
-
-        const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
-            clientSecret,
-            {
-                payment_method: {
-                    card: card,
-                    billing_details: {
-                        email: user?.email || 'unknown',
-                        name: user?.displayName || 'anonymous'
-                    },
-                },
-            },
-        );
+        // confirm payment
+        const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: card,
+                billing_details: {
+                    email: user?.email || 'anonymous',
+                    name: user?.displayName || 'anonymous'
+                }
+            }
+        })
 
         if (confirmError) {
+            console.log('confirm error');
             console.log(confirmError);
         }
+        else {
+            console.log('payment intent', paymentIntent)
+            if (paymentIntent.status === 'succeeded') {
+                console.log('transaction id', paymentIntent.id);
+                setTransactionId(paymentIntent.id);
 
-        console.log('payment intent', paymentIntent)
-        setProcessing(false)
-        if (paymentIntent.status === 'succeeded') {
-            setTransactionId(paymentIntent.id);
-            // save payment information to the server
-            const payment = {
-                email: user?.email,
-                transactionId: paymentIntent.id,
-                price,
-                date: new Date(),
-                quantity: cart.length,
-                cartItems: cart.map(item => item._id),
-                menuItems: cart.map(item => item.menuItemId),
-                status: 'service pending',
-                itemNames: cart.map(item => item.name)
+                // now save the payment in the database
+                const payment = {
+                    email: user.email,
+                    price: totalPrice,
+                    transactionId: paymentIntent.id,
+                    date: new Date(), // utc date convert. use moment js to 
+                    cartIds: cart.map(item => item._id),
+                    menuItemIds: cart.map(item => item.menuId),
+                    status: 'pending'
+                }
+
+                const res = await axiosSecure.post('/payments', payment);
+                console.log('payment saved', res.data);
+                refetch();
+                if (res.data?.paymentResult?.insertedId) {
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        title: "Thank you for the taka paisa",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    navigate('/dashboard/paymentHistory')
+                }
+
             }
-            axiosSecure.post('/payments', payment)
-                .then(res => {
-                    console.log(res.data);
-                    if (res.data.result.insertedId) {
-                        // display confirm
-                    }
-                })
         }
-
 
     }
 
     return (
-        <>
-            <form className="w-2/3 m-8" onSubmit={handleSubmit}>
-                <CardElement
-                    options={{
-                        style: {
-                            base: {
-                                fontSize: '16px',
-                                color: '#424770',
-                                '::placeholder': {
-                                    color: '#aab7c4',
-                                },
-                            },
-                            invalid: {
-                                color: '#9e2146',
+        <form onSubmit={handleSubmit}>
+            <CardElement
+                options={{
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#424770',
+                            '::placeholder': {
+                                color: '#aab7c4',
                             },
                         },
-                    }}
-                />
-                <button className="btn btn-primary btn-sm mt-4" type="submit" disabled={!stripe || !clientSecret || processing}>
-                    Pay
-                </button>
-            </form>
-            {cardError && <p className="text-red-600 ml-8">{cardError}</p>}
-            {transactionId && <p className="text-green-500">Transaction complete with transactionId: {transactionId}</p>}
-        </>
+                        invalid: {
+                            color: '#9e2146',
+                        },
+                    },
+                }}
+            />
+            <button className="btn btn-sm btn-primary my-4" type="submit" disabled={!stripe || !clientSecret}>
+                Pay
+            </button>
+            <p className="text-red-600">{error}</p>
+            {transactionId && <p className="text-green-600"> Your transaction id: {transactionId}</p>}
+        </form>
     );
 };
 

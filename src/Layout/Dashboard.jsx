@@ -25,10 +25,10 @@ const Dashboard = () => {
                             :
                             <>
                                 <li><NavLink to="/dashboard/userhome"><FaHome></FaHome> User Home</NavLink></li>
-                                <li><NavLink to="/dashboard/reservation"><FaCalendar></FaCalendar> Reservation</NavLink></li>
+                                <li><NavLink to="/dashboard/history"><FaCalendar></FaCalendar> Payment History</NavLink></li>
                                 <li><NavLink to="/dashboard/cart"><FaShoppingCart></FaShoppingCart> My Cart ({cart.length})</NavLink></li>
                                 <li><NavLink to="/dashboard/review"><FaAd></FaAd> Add a Review</NavLink></li>
-                                <li><NavLink to="/dashboard/bookings"><FaList></FaList> My Bookings</NavLink></li>
+                                <li><NavLink to="/dashboard/paymentHistory"><FaList></FaList> Real Payment History</NavLink></li>
                             </>
                     }
 
