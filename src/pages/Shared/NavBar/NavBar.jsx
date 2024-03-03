@@ -19,7 +19,7 @@ const NavBar = () => {
     const navOptions = <>
         <li><Link to="/">Home</Link></li>
         <li><Link to="/menu">Our Menu</Link></li>
-        <li><Link to="/order/salad">Order Food</Link></li>
+        <li><Link to="/order/offered">Order Food</Link></li>
         {/* <li><Link to="/secret">Secret</Link></li> */}
         {
             user && isAdmin && <li><Link to="/dashboard/adminHome">Dashboard</Link></li>
@@ -57,7 +57,7 @@ const NavBar = () => {
                             {navOptions}
                         </ul>
                     </div>
-                    <a className="btn btn-ghost normal-case text-xl">Bistro Boss</a>
+                    <a className="btn btn-ghost normal-case text-xl">Meghna Kitchen</a>
                 </div>
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
@@ -65,7 +65,8 @@ const NavBar = () => {
                     </ul>
                 </div>
                 <div className="navbar-end">
-                    <a className="btn">Get started</a>
+                    {/* <a className="btn">Get started</a> */}
+                    <Link className="btn" to="/order/offered">Get started</Link>
                 </div>
             </div>
         </>

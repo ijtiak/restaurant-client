@@ -1,8 +1,23 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Meghna Kitchen
+# This is the client side code of a site of a restaurant
+## these are the dependencies used in the client side
+### 1. React
+### 2. React Router
+### 3. Daisy UI
+### 4. TanStack Query
+### 5. Axios
+### 6. Firebase
+### 7. Stripe
+### 8. React Helmet
+### 9. React Rating
+### 10. React Hook Form
+### 11. React Icons
+### 12. React Responsive Carousel
+### 13. React Parallax
+### 14. React Simple Captcha
+### 15. React Tabs
+### 16. Recharts
+### 17. SweetAlert
+### 18. Swiper
+## live site link of this client side deployed in firebase
+[https://restaurant-19bb5.web.app/](https://restaurant-19bb5.web.app/)
