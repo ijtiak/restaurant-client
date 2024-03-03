@@ -78,7 +78,7 @@ const AllUsers = () => {
     return (
         <div className="w-full">
             <Helmet>
-                <title>Bistro Boss | All users</title>
+                <title>Meghna Kitchen | All users</title>
             </Helmet>
             <div className="flex justify-evenly">
                 <h3 className="text-3xl font-semibold my-4">All Users</h3>
